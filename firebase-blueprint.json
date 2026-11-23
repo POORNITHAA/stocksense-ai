@@ -1,0 +1,290 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Authenticated user account and RBAC role record.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "email": { "type": "string", "format": "email", "maxLength": 200 },
+        "role": { "type": "string", "enum": ["ADMIN", "INVENTORY_MANAGER"] },
+        "photoUrl": { "type": "string", "maxLength": 500 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "name", "email", "role", "createdAt", "updatedAt"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Retail supermarket SKU with pricing, stock thresholds, and supplier linkage.",
+      "type": "object",
+      "properties": {
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "sku": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "barcode": { "type": "string", "maxLength": 64 },
+        "category": { "type": "string", "minLength": 1, "maxLength": 80 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "imageUrl": { "type": "string", "maxLength": 65536 },
+        "purchasePrice": { "type": "number" },
+        "sellingPrice": { "type": "number" },
+        "quantity": { "type": "number" },
+        "minimumStock": { "type": "number" },
+        "safetyStock": { "type": "number" },
+        "supplierId": { "type": "string", "maxLength": 128 },
+        "unit": { "type": "string", "minLength": 1, "maxLength": 32 },
+        "isActive": { "type": "boolean" },
+        "dataSource": { "type": "string", "enum": ["sample", "real"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "productId", "ownerId", "name", "sku", "category", "purchasePrice",
+        "sellingPrice", "quantity", "minimumStock", "safetyStock", "unit",
+        "isActive", "dataSource", "createdAt", "updatedAt"
+      ]
+    },
+    "SkuIndex": {
+      "title": "SkuIndex",
+      "description": "Atomic SKU uniqueness guard scoped per owner.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "sku": { "type": "string", "minLength": 1, "maxLength": 64 },
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["ownerId", "sku", "productId", "createdAt"]
+    },
+    "Supplier": {
+      "title": "Supplier",
+      "description": "Vendor or distributor supplying supermarket inventory.",
+      "type": "object",
+      "properties": {
+        "supplierId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "company": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "email": { "type": "string", "format": "email", "maxLength": 200 },
+        "phone": { "type": "string", "minLength": 5, "maxLength": 32 },
+        "address": { "type": "string", "maxLength": 300 },
+        "suppliedProducts": { "type": "array" },
+        "leadTimeDays": { "type": "number" },
+        "status": { "type": "string", "enum": ["active", "inactive"] },
+        "dataSource": { "type": "string", "enum": ["sample", "real"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "supplierId", "ownerId", "name", "company", "email", "phone",
+        "suppliedProducts", "leadTimeDays", "status", "dataSource", "createdAt", "updatedAt"
+      ]
+    },
+    "Sale": {
+      "title": "Sale",
+      "description": "POS / retail sales transaction with itemized line items.",
+      "type": "object",
+      "properties": {
+        "saleId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "invoiceNumber": { "type": "string", "minLength": 3, "maxLength": 64 },
+        "items": { "type": "array" },
+        "totalAmount": { "type": "number" },
+        "totalCost": { "type": "number" },
+        "totalProfit": { "type": "number" },
+        "paymentMethod": { "type": "string", "enum": ["Cash", "UPI", "Card", "Credit"] },
+        "saleDate": { "type": "string", "format": "date-time" },
+        "dataSource": { "type": "string", "enum": ["sample", "real"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "saleId", "ownerId", "invoiceNumber", "items", "totalAmount",
+        "totalCost", "totalProfit", "paymentMethod", "saleDate", "dataSource", "createdAt"
+      ]
+    },
+    "StockMovement": {
+      "title": "StockMovement",
+      "description": "Immutable inventory ledger audit entry for stock changes.",
+      "type": "object",
+      "properties": {
+        "movementId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productName": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "movementType": { "type": "string", "enum": ["STOCK_IN", "STOCK_OUT", "ADJUSTMENT", "SALE", "PURCHASE_RECEIPT"] },
+        "quantity": { "type": "number" },
+        "previousStock": { "type": "number" },
+        "newStock": { "type": "number" },
+        "referenceId": { "type": "string", "maxLength": 128 },
+        "reason": { "type": "string", "minLength": 1, "maxLength": 300 },
+        "dataSource": { "type": "string", "enum": ["sample", "real"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "movementId", "ownerId", "productId", "productName", "movementType",
+        "quantity", "previousStock", "newStock", "reason", "dataSource", "createdAt"
+      ]
+    },
+    "PurchaseOrder": {
+      "title": "PurchaseOrder",
+      "description": "Supplier purchase order with partial/full receiving workflow.",
+      "type": "object",
+      "properties": {
+        "purchaseOrderId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "poNumber": { "type": "string", "minLength": 3, "maxLength": 64 },
+        "supplierId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "supplierName": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "items": { "type": "array" },
+        "totalAmount": { "type": "number" },
+        "orderStatus": {
+          "type": "string",
+          "enum": ["Draft", "Pending", "Approved", "Ordered", "Partially Received", "Received", "Cancelled"]
+        },
+        "orderDate": { "type": "string", "format": "date-time" },
+        "expectedDeliveryDate": { "type": "string", "format": "date-time" },
+        "receivedDate": { "type": "string", "format": "date-time" },
+        "receiptIds": { "type": "array" },
+        "dataSource": { "type": "string", "enum": ["sample", "real"] },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "purchaseOrderId", "ownerId", "poNumber", "supplierId", "supplierName",
+        "items", "totalAmount", "orderStatus", "orderDate", "expectedDeliveryDate",
+        "dataSource", "createdAt", "updatedAt"
+      ]
+    },
+    "Forecast": {
+      "title": "Forecast",
+      "description": "Persisted demand forecast run and holdout MAE evaluation metrics.",
+      "type": "object",
+      "properties": {
+        "forecastId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "productName": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "algorithm": { "type": "string", "enum": ["MOVING_AVERAGE", "WEIGHTED_MOVING_AVERAGE", "LINEAR_REGRESSION"] },
+        "aggregation": { "type": "string", "enum": ["daily", "weekly", "monthly"] },
+        "forecastHorizon": { "type": "number" },
+        "predictions": { "type": "array" },
+        "evaluationMetrics": { "type": "object" },
+        "generatedAt": { "type": "string", "format": "date-time" },
+        "dataSource": { "type": "string", "enum": ["sample", "real"] }
+      },
+      "required": [
+        "forecastId", "ownerId", "productId", "productName", "algorithm",
+        "aggregation", "forecastHorizon", "predictions", "evaluationMetrics",
+        "generatedAt", "dataSource"
+      ]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Deduplicated operational alert for stock, POs, and forecasts.",
+      "type": "object",
+      "properties": {
+        "notificationId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 1, "maxLength": 140 },
+        "message": { "type": "string", "minLength": 1, "maxLength": 400 },
+        "notificationType": {
+          "type": "string",
+          "enum": ["LOW_STOCK", "OUT_OF_STOCK", "REORDER", "PURCHASE_ORDER", "FORECAST"]
+        },
+        "conditionKey": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "isRead": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "notificationId", "ownerId", "title", "message",
+        "notificationType", "conditionKey", "isRead", "createdAt"
+      ]
+    },
+    "StoreSettings": {
+      "title": "StoreSettings",
+      "description": "Owner-scoped store preferences and reorder defaults.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "storeName": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "currency": { "type": "string", "minLength": 3, "maxLength": 8 },
+        "timezone": { "type": "string", "minLength": 2, "maxLength": 64 },
+        "defaultSafetyStock": { "type": "number" },
+        "defaultLeadTimeDays": { "type": "number" },
+        "lowStockThreshold": { "type": "number" },
+        "theme": { "type": "string", "enum": ["light", "dark"] },
+        "demoSeeded": { "type": "boolean" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "ownerId", "storeName", "currency", "timezone", "defaultSafetyStock",
+        "defaultLeadTimeDays", "lowStockThreshold", "theme", "demoSeeded", "updatedAt"
+      ]
+    },
+    "AssistantMessage": {
+      "title": "AssistantMessage",
+      "description": "Persisted AI business assistant conversation turn scoped to authenticated owner.",
+      "type": "object",
+      "properties": {
+        "messageId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "ownerId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "role": { "type": "string", "enum": ["user", "assistant"] },
+        "content": { "type": "string", "minLength": 1, "maxLength": 12000 },
+        "dataSourceFilter": { "type": "string", "enum": ["all", "sample", "real"] },
+        "metricsTimestamp": { "type": "string", "maxLength": 64 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "messageId", "ownerId", "role", "content", "dataSourceFilter", "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "User profiles and RBAC roles."
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Supermarket product catalog and real-time stock quantities."
+    },
+    "/skuIndex/{indexId}": {
+      "schema": { "$ref": "#/entities/SkuIndex" },
+      "description": "SKU uniqueness index per owner."
+    },
+    "/suppliers/{supplierId}": {
+      "schema": { "$ref": "#/entities/Supplier" },
+      "description": "Registered product suppliers and lead times."
+    },
+    "/sales/{saleId}": {
+      "schema": { "$ref": "#/entities/Sale" },
+      "description": "Completed retail sales transactions."
+    },
+    "/stockMovements/{movementId}": {
+      "schema": { "$ref": "#/entities/StockMovement" },
+      "description": "Stock in, stock out, adjustment, sale, and PO receipt ledger."
+    },
+    "/purchaseOrders/{purchaseOrderId}": {
+      "schema": { "$ref": "#/entities/PurchaseOrder" },
+      "description": "Supplier purchase orders and receiving records."
+    },
+    "/forecasts/{forecastId}": {
+      "schema": { "$ref": "#/entities/Forecast" },
+      "description": "Saved demand forecasting outputs and evaluation metrics."
+    },
+    "/notifications/{notificationId}": {
+      "schema": { "$ref": "#/entities/Notification" },
+      "description": "Operational notifications for stock and orders."
+    },
+    "/settings/{ownerId}": {
+      "schema": { "$ref": "#/entities/StoreSettings" },
+      "description": "Store configuration, defaults, and theme preference."
+    },
+    "/assistantMessages/{messageId}": {
+      "schema": { "$ref": "#/entities/AssistantMessage" },
+      "description": "Persistent AI business assistant conversation history per store owner."
+    }
+  }
+}
